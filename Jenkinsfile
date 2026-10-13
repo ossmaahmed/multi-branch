@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        APP_NAME = 'app-hello-nti'
+        APP_NAME = 'app-python'
         REPO_URL = 'https://github.com/ossmaahmed/python-jenkins'
     }
 
