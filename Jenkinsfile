@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         APP_NAME = 'app-python'
-        REPO_URL = 'https://github.com/ossmaahmed/python-jenkins'
+        REPO_URL = 'https://github.com/ossmaahmed/multi-branch'
     }
 
     stages {
