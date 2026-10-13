@@ -39,7 +39,7 @@ pipeline {
             steps {
                 sh '''
                     docker rm -f ${APP_NAME} || true
-                    docker run -d -p 443:443 --name ${APP_NAME} ${APP_NAME}:${BUILD_NUMBER}
+                    docker run -d -p 8082:8082 --name ${APP_NAME} ${APP_NAME}:${BUILD_NUMBER}
                     docker ps
                 '''
             }
