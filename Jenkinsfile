@@ -14,10 +14,8 @@ pipeline {
         stage('Prepare') {
             steps {
                 script {
-                    // اسم الـ branch بعد تنظيفه (feature/x -> feature-x) عشان يصلح كاسم docker
                     env.BRANCH_SAFE    = env.BRANCH_NAME.replaceAll('[^a-zA-Z0-9_.-]', '-').toLowerCase()
 
-                    // كل branch ليه image خاصة بيه على Docker Hub: <username>/new-app-<branch>
                     env.IMAGE_NAME     = "${APP_NAME}-${env.BRANCH_SAFE}"
                     env.CONTAINER_NAME = env.IMAGE_NAME
                     env.IMAGE_TAG      = env.BUILD_NUMBER
@@ -63,12 +61,9 @@ pipeline {
         stage('Run Docker Container') {
             steps {
                 sh '''
-                    # لو في كونتينر قديم لنفس الـ branch، خُد بورته عشان يفضل ثابت بين الـ builds
                     OLD_PORT=$(docker port ${CONTAINER_NAME} 5000 2>/dev/null | head -n1 | awk -F: '{print $NF}')
                     docker rm -f ${CONTAINER_NAME} || true
 
-                    # أول مرة: Docker بيختار بورت فاضي تلقائياً (-p 5000)
-                    # بعد كده: بيستخدم نفس البورت القديم، ولو اتشغل عليه حاجة تانية بيرجع لبورت عشوائي
                     if [ -n "$OLD_PORT" ]; then PORT_MAP="${OLD_PORT}:5000"; else PORT_MAP="5000"; fi
                     docker run -d --name ${CONTAINER_NAME} -p ${PORT_MAP} ${IMAGE_NAME}:${IMAGE_TAG} || {
                         docker rm -f ${CONTAINER_NAME} || true
@@ -86,7 +81,6 @@ pipeline {
         stage('Cleanup old images') {
             steps {
                 sh '''
-                    # امسح الـ tags الرقمية القديمة بتاعت نفس الـ image وسيب الأخيرة بس
                     docker images ${IMAGE_NAME} --format '{{.Tag}}' \
                       | grep -E '^[0-9]+$' \
                       | grep -v "^${IMAGE_TAG}$" \
